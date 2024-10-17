@@ -1,4 +1,6 @@
 import type { MetaFunction } from "@remix-run/node";
+import { Link } from "@remix-run/react";
+import LandingPage from "../components/LandingPage";
 
 export const meta: MetaFunction = () => {
   return [
@@ -8,5 +10,9 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
-  return <div>Hello World</div>;
+  return (
+    <>
+      <LandingPage />
+    </>
+  );
 }
