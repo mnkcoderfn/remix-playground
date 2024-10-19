@@ -3,18 +3,14 @@ import { Bars3Icon } from '@heroicons/react/24/outline';
 import { Dialog, DialogPanel } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import LinkButton from './LinkButton';
-interface NavigationItem {
-    name: string;
-    href: string;
-}
+import { Link } from '@remix-run/react';
 
 interface LoggedOutHeaderProps {
-    navigation: NavigationItem[];
     setMobileMenuOpen: (open: boolean) => void;
     mobileMenuOpen: boolean;
 }
 
-const LoggedOutHeader: React.FC<LoggedOutHeaderProps> = ({ navigation, setMobileMenuOpen, mobileMenuOpen }) => {
+const LoggedOutHeader: React.FC<LoggedOutHeaderProps> = ({ setMobileMenuOpen, mobileMenuOpen }) => {
     return (
         <>
             <header className="fixed inset-x-0 top-0 z-50 bg-white">
@@ -40,11 +36,10 @@ const LoggedOutHeader: React.FC<LoggedOutHeaderProps> = ({ navigation, setMobile
                         </button>
                     </div>
                     <div className="hidden lg:flex lg:gap-x-12">
-                        {navigation.map((item) => (
-                            <a key={item.name} href={item.href} className="text-sm font-semibold leading-6 text-gray-900">
-                                {item.name}
-                            </a>
-                        ))}
+                        <Link to="/products" className="text-sm font-semibold leading-6 text-gray-900">Products</Link>
+                        <Link to="/features" className="text-sm font-semibold leading-6 text-gray-900">Features</Link>
+                        <Link to="/marketplace" className="text-sm font-semibold leading-6 text-gray-900">Marketplace</Link>
+                        <Link to="/companies" className="text-sm font-semibold leading-6 text-gray-900">Companies</Link>
                     </div>
                     <div className="hidden lg:flex lg:flex-1 lg:justify-end">
                         <LinkButton
@@ -53,7 +48,7 @@ const LoggedOutHeader: React.FC<LoggedOutHeaderProps> = ({ navigation, setMobile
                             size="small"
                             color="black"
                         >
-                            Log in
+                            Sign In
                         </LinkButton>
                     </div>
                 </nav>
@@ -83,23 +78,15 @@ const LoggedOutHeader: React.FC<LoggedOutHeaderProps> = ({ navigation, setMobile
                     <div className="mt-6 flow-root">
                         <div className="-my-6 divide-y divide-gray-500/10">
                             <div className="space-y-2 py-6">
-                                {navigation.map((item) => (
-                                    <a
-                                        key={item.name}
-                                        href={item.href}
-                                        className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                                    >
-                                        {item.name}
-                                    </a>
-                                ))}
+                                <Link to="/products" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Products</Link>
+                                <Link to="/features" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Features</Link>
+                                <Link to="/marketplace" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Marketplace</Link>
+                                <Link to="/companies" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">Companies</Link>    
                             </div>
                             <div className="py-6">
-                                <a
-                                    href="#"
-                                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                                >
-                                    Log in
-                                </a>
+                                <Link to="/sign-in" className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                                    Sign In
+                                </Link>
                             </div>
                         </div>
                     </div>

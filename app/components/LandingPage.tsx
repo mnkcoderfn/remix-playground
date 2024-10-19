@@ -8,12 +8,6 @@ import {
     ServerIcon,
 } from '@heroicons/react/20/solid'
 
-const navigation = [
-    { name: 'Product', href: '#' },
-    { name: 'Features', href: '#' },
-    { name: 'Marketplace', href: '#' },
-    { name: 'Companies', href: '#' },
-]
 const primaryFeatures = [
     {
         name: 'Push to deploy.',
@@ -217,7 +211,7 @@ export default function LandingPage() {
 
     return (
         <div className="bg-white">
-            <LoggedOutHeader navigation={navigation} setMobileMenuOpen={setMobileMenuOpen} mobileMenuOpen={mobileMenuOpen} />
+            <LoggedOutHeader setMobileMenuOpen={setMobileMenuOpen} mobileMenuOpen={mobileMenuOpen} />
             <main className="pt-[72px]">
                 {/* Hero section */}
                 <div className="relative isolate pt-14">
