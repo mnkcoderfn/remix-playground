@@ -211,9 +211,9 @@ export default function LandingPage() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [currentSlide, setCurrentSlide] = useState(0)
     const slides = [
-        'https://tailwindui.com/plus/img/component-images/mobile-app-screenshot.png',
-        'https://tailwindui.com/plus/img/component-images/mobile-app-screenshot.png',
-        'https://tailwindui.com/plus/img/component-images/mobile-app-screenshot.png',
+        { image: 'https://tailwindui.com/plus/img/component-images/mobile-app-screenshot.png', label: 'Home Screen' },
+        { image: 'https://tailwindui.com/plus/img/component-images/mobile-app-screenshot.png', label: 'Profile' },
+        { image: 'https://tailwindui.com/plus/img/component-images/mobile-app-screenshot.png', label: 'Settings' },
     ]
 
     useEffect(() => {
@@ -269,14 +269,29 @@ export default function LandingPage() {
                                 </a>
                             </div>
                         </div>
-                        <div className="mt-16 sm:mt-24 lg:mt-0 lg:flex-shrink-0 lg:flex-grow">
+                        <div className="mt-16 sm:mt-24 lg:mt-0">
+                            <div className="flex justify-center space-x-4 mb-4">
+                                {slides.map((slide, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => setCurrentSlide(index)}
+                                        className={`text-sm transition-all duration-300 ${
+                                            index === currentSlide
+                                                ? 'text-green-600 font-bold underline underline-offset-4'
+                                                : 'text-gray-400 hover:text-gray-600'
+                                        }`}
+                                    >
+                                        {slide.label}
+                                    </button>
+                                ))}
+                            </div>
                             <div className="phone-frame">
                                 <div className="carousel">
                                     {slides.map((slide, index) => (
                                         <img
                                             key={index}
-                                            src={slide}
-                                            alt={`App screenshot ${index + 1}`}
+                                            src={slide.image}
+                                            alt={`App screenshot: ${slide.label}`}
                                             className={`carousel-slide ${index === currentSlide ? 'active' : ''}`}
                                         />
                                     ))}
