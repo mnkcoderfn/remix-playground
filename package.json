@@ -23,6 +23,7 @@
     "@tailwindcss/forms": "^0.5.9",
     "gpt-tokenizer": "^2.8.1",
     "isbot": "^4.1.0",
+    "jose": "^6.0.11",
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^1.1.1",
     "pdf2json": "^3.1.5",

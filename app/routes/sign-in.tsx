@@ -1,10 +1,35 @@
 import React, { useState } from 'react';
 import Button from '../components/Button';
-import { Link } from '@remix-run/react';
+import { Form, json, Link, redirect, useActionData } from '@remix-run/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faXTwitter } from '@fortawesome/free-brands-svg-icons';
+import { authCookie } from '~/auth/auth.server';
+import { createJWT } from '~/auth/jwt.server';
+import { ActionFunctionArgs } from '@remix-run/node';
+
+export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const email = formData.get("email");
+  const password = formData.get("password");
+
+  // Fake user check — replace with DB logic
+  if (email === "test@example.com" && password === "password123") {
+    const token = await createJWT({ email });
+
+    return redirect("/dashboard", {
+      headers: {
+        "Set-Cookie": await authCookie.serialize(token)
+      }
+    });
+  }
+
+  return json({ error: "Invalid credentials" }, { status: 401 });
+}
+
 
 const SignIn: React.FC = () => {
+
+  const actionData = useActionData<typeof action>();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -75,7 +100,33 @@ const SignIn: React.FC = () => {
               </div>
             </div>
 
-            <form action="#" method="POST" className="mt-6 space-y-6">
+            <Form method="post" className="mt-6 space-y-6">
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                autoComplete="email"
+                placeholder="Enter your email"
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                autoComplete="current-password"
+                placeholder="Enter your password"
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+              <button type="submit" className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                Sign in
+              </button>
+              {actionData?.error && <p>{actionData.error}</p>}
+            </Form>
+
+            {/* <form action="#" method="POST" className="mt-6 space-y-6">
               <div>
                 <div className="mt-2">
                   <input
@@ -99,7 +150,7 @@ const SignIn: React.FC = () => {
                   Sign in
                 </Button>
               </div>
-            </form>
+            </form> */}
           </div>
 
           <p className="mt-10 text-center text-sm text-gray-500">
