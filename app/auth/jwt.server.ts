@@ -1,9 +1,9 @@
-import { SignJWT, jwtVerify } from 'jose';
+import { JWTPayload, SignJWT, jwtVerify } from 'jose';
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'default_secret');
 const alg = 'HS256';
 
-export async function createJWT(payload: object) {
+export async function createJWT(payload: JWTPayload) {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg })
     .setIssuedAt()

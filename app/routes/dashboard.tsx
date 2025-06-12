@@ -3,6 +3,7 @@ import { redirect, useLoaderData } from '@remix-run/react';
 import { verifyJWT } from '~/auth/jwt.server';
 import { authCookie } from '~/auth/auth.server';
 import { LoaderFunctionArgs } from '@remix-run/node';
+import { useUser } from "~/auth/userContext";
 
 export async function loader({ request }: LoaderFunctionArgs) {
     const cookieHeader = request.headers.get("Cookie");
@@ -17,7 +18,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 const Dashboard: React.FC = () => {
-    const { user } = useLoaderData<typeof loader>();
+    const { user } = useUser();
+    console.log(user);
 
     return (
         <>
@@ -27,7 +29,7 @@ const Dashboard: React.FC = () => {
                         Dashboard Page
                     </h2>
 
-                    <p>Welcome {user.email}</p>
+                    <p>Welcome {user?.email}</p>
                 </div>
             </div>
         </>
