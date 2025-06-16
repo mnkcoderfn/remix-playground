@@ -1,24 +1,11 @@
 import React from 'react';
-import { redirect, useLoaderData } from '@remix-run/react';
-import { verifyJWT } from '~/auth/jwt.server';
-import { authCookie } from '~/auth/auth.server';
-import { LoaderFunctionArgs } from '@remix-run/node';
-import { useUser } from "~/auth/userContext";
+import { useLoaderData } from '@remix-run/react';
+import { protectedLoader } from '~/auth/protected-route.server';
 
-export async function loader({ request }: LoaderFunctionArgs) {
-    const cookieHeader = request.headers.get("Cookie");
-    const token = await authCookie.parse(cookieHeader);
-
-    const payload = token && await verifyJWT(token);
-    if (!payload) {
-        return redirect("/sign-in");
-    }
-
-    return { user: payload };
-}
+export { protectedLoader as loader };
 
 const Dashboard: React.FC = () => {
-    const { user } = useUser();
+    const { user } = useLoaderData<typeof protectedLoader>();
     console.log(user);
 
     return (
