@@ -5,27 +5,56 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faXTwitter } from '@fortawesome/free-brands-svg-icons';
 import { authCookie } from '~/auth/auth.server';
 import { createJWT } from '~/auth/jwt.server';
-import { ActionFunctionArgs } from '@remix-run/node';
+import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
+import { createLoaderContext, getUserService, getValidateUtility } from '~/context/loader';
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function loader({ context }: LoaderFunctionArgs) {
+  const loaderContext = createLoaderContext();
+  const userService = getUserService(loaderContext);
+  
+  // You can perform any initialization or validation here
+  // For example, check if user is already authenticated
+  
+  return json({ 
+    message: "Sign in page loaded",
+    userServiceEmail: userService.getEmail(),
+    isEmailValid: userService.isEmailValid()
+  });
+}
+
+export async function action({ request, context }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const email = formData.get("email");
-  const password = formData.get("password");
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
 
-  // Fake user check — replace with DB logic
-  if (email === "test@example.com" && password === "password123") {
-    const token = await createJWT({ email });
+  const loaderContext = createLoaderContext();
+  const userService = getUserService(loaderContext);
+  const validateUtility = getValidateUtility(loaderContext);
+
+  // Use injected services for validation
+  if (!validateUtility.isValidEmail(email)) {
+    return json({ error: "Invalid email format" }, { status: 400 });
+  }
+
+  try {
+    // Use user service for authentication
+    const user = await userService.authenticateUser(email, password);
+    
+    if (!user) {
+      return json({ error: "Invalid credentials" }, { status: 401 });
+    }
+
+    const token = await createJWT({ email: user.email });
 
     return redirect("/dashboard", {
       headers: {
         "Set-Cookie": await authCookie.serialize(token)
       }
     });
+  } catch (error) {
+    return json({ error: "Authentication failed" }, { status: 500 });
   }
-
-  return json({ error: "Invalid credentials" }, { status: 401 });
 }
-
 
 const SignIn: React.FC = () => {
 

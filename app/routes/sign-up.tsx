@@ -1,18 +1,63 @@
 import React, { useState } from 'react';
 import Button from '../components/Button';
-import { Link } from '@remix-run/react';
+import { Form, json, Link, useActionData, useLoaderData } from '@remix-run/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebook, faXTwitter } from '@fortawesome/free-brands-svg-icons';
+import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
+import { createLoaderContext, getUserService, getValidateUtility } from '~/context/loader';
 
-const SignIn: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export async function loader({ context }: LoaderFunctionArgs) {
+  const loaderContext = createLoaderContext();
+  const userService = getUserService(loaderContext);
+  
+  // You can perform any initialization here
+  // For example, check if user is already authenticated
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Implement sign-in logic here
-    console.log('Sign in attempt with:', { email, password });
-  };
+  console.log(userService.getEmail());
+  
+  return json({ 
+    message: "Sign up page loaded",
+    userServiceEmail: userService.getEmail(),
+    isEmailValid: userService.isEmailValid()
+  });
+}
+
+export async function action({ request, context }: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  const loaderContext = createLoaderContext();
+  const userService = getUserService(loaderContext);
+  const validateUtility = getValidateUtility(loaderContext);
+
+  // Use injected services for validation
+  if (!validateUtility.isValidEmail(email)) {
+    return json({ error: "Invalid email format" }, { status: 400 });
+  }
+
+  if (!userService.validatePassword(password)) {
+    return json({ error: "Password must be at least 6 characters long" }, { status: 400 });
+  }
+
+  try {
+    // Use user service for registration
+    const newUser = await userService.registerUser(email, password);
+    
+    return json({ 
+      success: true, 
+      message: "Account created successfully",
+      email: newUser.email 
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Registration failed";
+    return json({ error: errorMessage }, { status: 400 });
+  }
+}
+
+const SignUp: React.FC = () => {
+  const loaderData = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
 
   return (
     <>
@@ -75,31 +120,42 @@ const SignIn: React.FC = () => {
               </div>
             </div>
 
-            <form action="#" method="POST" className="mt-6 space-y-6">
-              <div>
-                <div className="mt-2">
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    autoComplete="email"
-                    placeholder="Enter your email"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-              <div>
-                <Button
-                  type="primary"
-                  size="medium"
-                  fullWidth={true}
-                  color="black"
-                >
-                  Sign in
-                </Button>
-              </div>
-            </form>
+            <Form method="post" className="mt-6 space-y-6">
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                autoComplete="email"
+                placeholder="Enter your email"
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                autoComplete="new-password"
+                placeholder="Enter your password"
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+
+              <button 
+                type="submit" 
+                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
+                Create account
+              </button>
+
+              {actionData && 'error' in actionData && (
+                <p className="text-red-600 text-sm">{actionData.error}</p>
+              )}
+              
+              {actionData && 'success' in actionData && actionData.success && (
+                <p className="text-green-600 text-sm">{actionData.message}</p>
+              )}
+            </Form>
           </div>
 
           <p className="mt-10 text-center text-sm text-gray-500">
@@ -114,4 +170,4 @@ const SignIn: React.FC = () => {
   )
 };
 
-export default SignIn;
+export default SignUp;
