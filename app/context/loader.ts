@@ -22,4 +22,8 @@ export function getUserService(context: LoaderContext) {
 
 export function getValidateUtility(context: LoaderContext) {
   return getServices(context).validateUtility;
+}
+
+export function getDatabaseService(context: LoaderContext) {
+  return getServices(context).databaseService;
 } 
